@@ -1,7 +1,7 @@
 pipeline {
     environment {
         registry = "bbumba/bootcamp"
-        registryCredential = 'bbumba'
+        registryCredential = ''
         dockerImage = ''
     }
     agent any
