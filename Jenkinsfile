@@ -27,6 +27,11 @@ pipeline {
                 }
             }
         }
+        stage("3"){
+            steps{
+                sh "kubectl create deployment practice --image=bbumba/practice:$BUILD_NUMBER-1"
+            }
+        }
         stage('Cleaning up') {
             steps{
                 sh "docker rmi $registry:$BUILD_NUMBER"
