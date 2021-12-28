@@ -1,20 +1,36 @@
-pipeline{
+pipeline {
+    environment {
+        registry = "bbumba/bootcamp"
+        registryCredential = 'dockerhub_id'
+        dockerImage = ''
+    }
     agent any
-    stages{
-        stage("1"){
-            steps{
-                sh "docker image build -f ./Dockerfile --tag $bbumba/practice ."
+    stages {
+        stage('Cloning our Git') {
+            steps {
+                git 'https://github.com/BOsmola/practice.git'
             }
         }
-        stage("2"){
+        stage('Building our image') {
             steps{
-                sh "docker image push $bbumba/practice"
+                script {
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                }
             }
         }
-	stage("3"){
-	    steps{
-		sh "kubectl create deployment practice --image=bbumba/practice"
-	    }
-	}
+        stage('Deploy our image') {
+            steps{
+                script {
+                    docker.withRegistry( '', registryCredential ) {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+        stage('Cleaning up') {
+            steps{
+                sh "docker rmi $registry:$BUILD_NUMBER"
+            }
+        }
     }
 }
